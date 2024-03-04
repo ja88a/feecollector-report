@@ -1,0 +1,27 @@
+service: lifi-feecollector-events-scraper
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3003
+    lambdaPort: 3005
+
+functions:
+  scrapFeeCollectorEvents:
+    handler: dist/main.scrapFeeCollectorEvents
+    events:
+      - http:
+          method: GET
+          path: /chain/{id}
+          request:
+            parameters:
+              paths:
+                id: true
+
+provider:
+  name: aws
+  region: eu-west-3
+  runtime: nodejs18.x
+  stage: dev
