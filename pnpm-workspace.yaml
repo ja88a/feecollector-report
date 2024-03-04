@@ -1,0 +1,5 @@
+packages:
+  - 'common'
+  - 'events-scraper'
+  - 'fees-reporter'
+  - 'externals/lifi-contract-types'

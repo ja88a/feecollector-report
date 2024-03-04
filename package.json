@@ -1,0 +1,25 @@
+{
+  "name": "feecollector-service-monorepo-root",
+  "version": "0.1.0",
+  "description": "Mono-repository Root of the LiFi FeeCollector Reporter offchain services",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "common",
+    "events-scraper",
+    "fees-reporter",
+    "externals/lifi-contract-types"
+  ],
+  "scripts": {
+    "serverless:plugin": "serverless events-scraper:<plugin-name>",
+    "serverless:deploy": "serverless deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "@nestjs/cli": "^10.3.2",
+    "serverless": "^3.38.0"
+  }
+}
