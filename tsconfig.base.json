@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "commonjs", // NodeNext
-    //"moduleResolution": "NodeNext",
-    // "lib": [
-    //   "ES2022",
-    // ],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": [
+      "ES2022",
+    ],
     "declaration": true,
     "removeComments": false,
     "emitDecoratorMetadata": true,
