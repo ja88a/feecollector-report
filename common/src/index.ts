@@ -1,4 +1,4 @@
-export * as config from './config';
-export * as data from './data';
-export * as database from './database';
-export * as logger from './logger';
+export * from './config'
+export * from './data'
+export * from './database'
+export * from './logger'

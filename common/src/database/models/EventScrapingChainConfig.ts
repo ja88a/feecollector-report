@@ -5,14 +5,13 @@ import { prop } from '@typegoose/typegoose/lib/prop'
 /**
  * Schema of the FeeCollector chain configuration document
  */
-@modelOptions({ schemaOptions: { collection: 'EventScrapingChainConfigs' } })
+@modelOptions({
+  schemaOptions: { collection: 'EventScrapingChainConfigs', versionKey: '0' },
+  options: { disableCaching: false },
+})
 export class EventScrapingChainConfig extends TimeStamps {
-  /** Unique id of the EventScrapingChainConfig doc entry */
-  @prop({ unique: true })
-  id: string
-
   /** the target blockchain key, based on Lifi data types */
-  @prop()
+  @prop({ unique: true, index: true })
   chainKey: string
 
   /** the target blockchain ID, based on Lifi data types */

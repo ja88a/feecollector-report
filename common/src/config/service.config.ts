@@ -1,4 +1,4 @@
-import { ValidatorOptions } from 'class-validator';
+import { ValidatorOptions } from 'class-validator'
 
 /**
  * Common set of settings relating to the Microservice configuration
@@ -30,7 +30,7 @@ export const MS_CONFIG = {
    * Publish or not (`false`) the OpenAPI REST API specifications
    */
   OPENAPI_PUBLISH: true,
-};
+}
 
 /**
  * Set of constants specific to the logger's configuration
@@ -51,7 +51,7 @@ export const LOGGER = {
    * Leave it empty `''` for the default ISO date format
    */
   TIMESTAMP_PATTERN: 'YYYY-MM-DD HH:mm:ss.SSS',
-};
+}
 
 /**
  * Imported Data Validation options
@@ -67,7 +67,7 @@ export const VALID_OPT: ValidatorOptions = {
     value: true,
   },
   stopAtFirstError: false,
-};
+}
 
 /**
  * Supported run modes
@@ -91,4 +91,4 @@ export enum EProcessExitSignal {
 /**
  * Max duration expressed in milliseconds to wait for shutting down the app
  */
-export const EXIT_MAX_WAIT_MS: number = 10_000;
+export const EXIT_MAX_WAIT_MS: number = 10_000

@@ -1,9 +1,9 @@
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports } from 'winston'
 
-import 'winston-daily-rotate-file';
-import { DailyRotateFile } from 'winston/lib/winston/transports';
+import 'winston-daily-rotate-file'
+import { DailyRotateFile } from 'winston/lib/winston/transports'
 
-import { EConfigRunMode, LOGGER } from '../config';
+import { EConfigRunMode, LOGGER } from '../config'
 
 /**
  * WinstonJS Logger integration
@@ -19,7 +19,7 @@ const logger = createLogger({
     format.timestamp({
       format: LOGGER.TIMESTAMP_PATTERN,
     }),
-    format.json(),
+    format.json()
   ),
   defaultMeta: { service: 'account-updates-ingestor' },
   transports: [
@@ -60,32 +60,30 @@ const logger = createLogger({
       maxFiles: '31d',
     }),
   ],
-});
+})
 
 //
 // If we're not in production mode then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
 //
 if (process.env.NODE_ENV !== EConfigRunMode.PROD) {
-  const consoleFormat = format.printf(
-    ({ timestamp, label, level, message }) => {
-      return `${timestamp} ${level} [${label}] ${message}`;
-    },
-  );
+  const consoleFormat = format.printf(({ timestamp, label, level, message }) => {
+    return `${timestamp} ${level} [${label}] ${message}`
+  })
 
   const alignedWithColorsAndTime = format.combine(
     format.colorize({ all: true }),
     format.timestamp({ format: LOGGER.TIMESTAMP_PATTERN }),
-    consoleFormat,
-  );
+    consoleFormat
+  )
 
   logger.add(
     new transports.Console({
       level: 'info',
       format: alignedWithColorsAndTime,
       handleExceptions: true,
-    }),
-  );
+    })
+  )
 }
 
-export default logger;
+export default logger

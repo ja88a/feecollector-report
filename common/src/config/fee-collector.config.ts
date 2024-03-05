@@ -2,32 +2,41 @@ import { ChainKey, ChainType, ChainId } from '@lifi/types'
 
 /** Configuration of onchain LiFi FeeCollector contracts */
 export interface FeeCollectorChainConfig {
-    /** Lifi blockchain ID */
-    chainId: ChainId,
+  /** the unique target blockchain key, based on Lifi data types */
+  readonly chainKey?: ChainKey
 
-    /** Lifi blockchain type */
-    chainType: ChainType,
+  /** Lifi blockchain ID */
+  chainId: ChainId
 
-    /** URL of the default JSON RPC provider */
-    rpcUrl: string,
+  /** Lifi blockchain type */
+  chainType: ChainType
 
-    /** Lifi FeeCollector contract address, an hexa string */
-    feeCollectorContract: string,
-    
-    /** The block number to consider for starting a new blockchain scan session of FeeCollector events */
-    feeCollectorBlockStart: number,
+  /** URL of the default JSON RPC provider */
+  rpcUrl: string
 
-    /** Last scanned block number during last scraping session of FeeCollected events */
-    feeCollectorBlockLastScanned?: number,
+  /** Lifi FeeCollector contract address, an hexa string */
+  feeCollectorContract: string
+
+  /** The block number to consider for starting a new blockchain scan session of FeeCollector events */
+  feeCollectorBlockStart: number
+
+  /** Last scanned block number during last scraping session of FeeCollected events */
+  feeCollectorBlockLastScanned?: number
+
+  /** DB document identifier */
+  docId?: string
 }
 
 /** Map of supported FeeCollector contracts per their hosting blockchain */
 export const feeCollectorChainConfigDefault: Map<string, FeeCollectorChainConfig> = new Map([
-    [ChainKey.POL, {
-        chainType: ChainType.EVM,
-        chainId: ChainId.POL,
-        rpcUrl: 'https://polygon-rpc.com',
-        feeCollectorContract: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',
-        feeCollectorBlockStart: 47961368,
-    }],
-]);
+  [
+    ChainKey.POL,
+    {
+      chainType: ChainType.EVM,
+      chainId: ChainId.POL,
+      rpcUrl: 'https://polygon-rpc.com',
+      feeCollectorContract: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',
+      feeCollectorBlockStart: 47961368,
+    },
+  ],
+])
