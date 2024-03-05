@@ -2,13 +2,15 @@ import { BlockTag } from '@ethersproject/abstract-provider'
 import { Injectable } from '@nestjs/common'
 import { BigNumber, ethers } from 'ethers'
 import {
-  EventScrapingChainConfigPersistence,
-  FeeCollectedEventParsed,
-  FeeCollectedEventPersistence,
-  FeeCollectorOnchainConfig,
-  Logger,
+  FeeCollectorChainConfig,
   feeCollectorChainConfigDefault,
-} from 'feecollector-service-common'
+} from 'feecollector-report-common/dist/config'
+import { FeeCollectedEventParsed } from 'feecollector-report-common/dist/data'
+import {
+  EventScrapingChainConfigPersistence,
+  FeeCollectedEventPersistence,
+} from 'feecollector-report-common/dist/database'
+import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
 import { FeeCollector__factory } from 'lifi-contract-typings'
 
 /**
@@ -38,21 +40,67 @@ export class FeeCollectorEventsScraper {
    */
   public async scrapFeeCollectorEvents(chainKey: string): Promise<void> {
     // Get the target FeeCollector chain configuration
-    const feeCollectorChainConfig: FeeCollectorOnchainConfig =
-      this.retrieveFeeCollectorChainConfig(chainKey)
+    const feeCollectorChainConfig = await this.retrieveFeeCollectorChainConfig(chainKey)
 
-    // Init the virtual contract for the chain
+    // Init the virtual contract on the target chain
     const feeCollectorContract = this.initFeeCollectorContract(
       feeCollectorChainConfig.feeCollectorContract,
       feeCollectorChainConfig.rpcUrl
     )
 
-    // Get last block number & start scraping block events in batches until there
-    const chainLastBlockNumber = await feeCollectorContract.provider.getBlockNumber()
+    // Get the chain last block number
+    const chainLastBlockNb = await feeCollectorContract.provider.getBlockNumber()
+    const lastScannedBlockNb =
+      feeCollectorChainConfig.feeCollectorBlockLastScanned ||
+      feeCollectorChainConfig.feeCollectorBlockStart
+    this.logger.info(
+      `Scraping FeeCollector.FeeCollected events on chain '${chainKey}' from block ${lastScannedBlockNb + 1} to last block ${chainLastBlockNb}`
+    )
 
-    // Get last scanned block number from the database
+    // Scrape the fee collected events through batches of block scanning
+    let countCollectedEvents = 0
+    const batchSize = 100
+    let blockStart = lastScannedBlockNb + 1
+    while (blockStart <= chainLastBlockNb) {
+      let blockEnd = blockStart + batchSize
+      if (blockEnd > chainLastBlockNb) {
+        blockEnd = chainLastBlockNb
+      }
 
-    // Scrape the onchain fee collected events
+      // Load the onchain events
+      const feeCollectedEvents = await this.loadFeeCollectorEvents(
+        feeCollectorContract,
+        blockStart,
+        blockEnd
+      )
+
+      if (feeCollectedEvents.length > 0) {
+        this.logger.info(`Found ${feeCollectedEvents.length} FeeCollectedEvent${feeCollectedEvents.length>1?'s':''} (last block ${blockEnd})`)
+
+        // Parse the fee collected events
+        const feeCollectedEventsParsed = this.parseFeeCollectorEvents(
+          chainKey,
+          feeCollectorContract,
+          feeCollectedEvents
+        )
+
+        // Persist the fee collected events
+        await this.feeCollectedEventPersistence.storeFeeCollectedEvents(feeCollectedEventsParsed)
+
+        countCollectedEvents += feeCollectedEvents.length
+      }
+
+      // Persist the last scanned block number
+      await this.eventScrapingChainConfigPersistence.updateFeeCollectorLastScannedBlock(
+        feeCollectorChainConfig.docId || '',
+        blockEnd
+      )
+      
+      // Update the block number to scan
+      blockStart = blockEnd
+    }
+
+    this.logger.info(`${countCollectedEvents} FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped successfully`)
   }
 
   /**
@@ -61,19 +109,26 @@ export class FeeCollectorEventsScraper {
    * @param chainKey the unique Lifi key of the target blockchain hosting the Lifi FeeCollector contract
    * @returns the target FeeCollector chain configuration
    */
-  async retrieveFeeCollectorChainConfig(chainKey: string): FeeCollectorOnchainConfig {
+  async retrieveFeeCollectorChainConfig(chainKey: string): Promise<FeeCollectorChainConfig> {
     const storedConfig = await this.eventScrapingChainConfigPersistence.getByChain(chainKey)
     if (!storedConfig) {
-      const feeCollectorChainConfig = feeCollectorChainConfigDefault[chainKey]
+      const feeCollectorChainConfig = feeCollectorChainConfigDefault.get(chainKey)
       if (!feeCollectorChainConfig) {
-        throw new Error(`No FeeCollector chain configuration found for chain ${chainKey}`)
+        throw new Error(
+          `No default configuration found for the FeeCollector scraping on chain '${chainKey}'`
+        )
       }
-      this.logger.info('Persisting default FeeCollector scraping configuration for chain %s', chainKey)
+      this.logger.info(
+        `Persisting default FeeCollector scraping configuration for chain '${chainKey}': ${JSON.stringify(feeCollectorChainConfig)}`
+      )
       return await this.eventScrapingChainConfigPersistence.createFeeCollectorEventScrapingConfig(
         chainKey,
         feeCollectorChainConfig
       )
     }
+    this.logger.info(
+      `FeeCollector scraping config for chain '${chainKey}:' ${JSON.stringify(storedConfig)}`
+    )
     return storedConfig
   }
 
@@ -128,6 +183,7 @@ export class FeeCollectorEventsScraper {
       const feesCollected: FeeCollectedEventParsed = {
         chainKey: chainKey,
         txHash: event.transactionHash,
+        blockTag: event.blockNumber,
         token: parsedEvent.args[0],
         integrator: parsedEvent.args[1],
         integratorFee: BigNumber.from(parsedEvent.args[2]),

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { KindagooseModule } from 'kindagoose'
+import { KindagooseModule, SchemaRegistrationOptions } from 'kindagoose'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
 import {
-  EventScrapingChainConfig,
-  FeeCollectedEvent,
   EventScrapingChainConfigPersistence,
   FeeCollectedEventPersistence,
-} from 'feecollector-service-common'
+  EventScrapingChainConfig,
+  FeeCollectedEvent,
+} from 'feecollector-report-common'
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import {
       inject: [ConfigService],
       useFactory(configService: ConfigService) {
         return {
-          uri: `${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`,
+          uri: 'mongodb://localhost:27017/fcrs' //`${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`,
         }
       },
     }),

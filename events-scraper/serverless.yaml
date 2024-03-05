@@ -18,7 +18,7 @@ functions:
           request:
             parameters:
               paths:
-                id: true
+                id: 'pol'
 
 provider:
   name: aws
