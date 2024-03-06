@@ -11,7 +11,7 @@
     "externals/lifi-contract-types"
   ],
   "scripts": {
-    "serverless:plugin": "serverless events-scraper:<plugin-name>",
+    "serverless:offline": "serverless events-scraper:offline",
     "serverless:deploy": "serverless deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,6 +20,7 @@
   "license": "AGPL-3.0-only",
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",
-    "serverless": "^3.38.0"
+    "serverless": "^3.38.0",
+    "@serverless/compose": "^1.3.0"
   }
 }

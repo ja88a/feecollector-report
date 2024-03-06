@@ -3,6 +3,9 @@
 **/node_modules
 **/build
 
+# Serverless states
+**/.serverless
+
 # Logs
 **/logs
 **/*.log

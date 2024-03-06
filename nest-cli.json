@@ -7,6 +7,15 @@
     "tsConfigPath": "./tsconfig.base.json"
   },
   "projects": {
+    "common": {
+      "type": "module",
+      "root": "common",
+      "entryFile": "main",
+      "sourceRoot": "common/src",
+      "compilerOptions": {
+        "tsConfigPath": "common/tsconfig.json"
+      }
+    },
     "fees-reporter": {
       "type": "application",
       "root": "fees-reporter",

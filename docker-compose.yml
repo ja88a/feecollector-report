@@ -1,0 +1,60 @@
+version: '3.8'
+
+volumes:
+  db_data:
+    driver: local
+  fcrs_data: {}
+
+networks:
+  fcrs-network:
+    driver: bridge
+
+services:
+  # FeeCollector Reporter API service
+  fcrs-report:
+    container_name: fcrs-api
+    build:
+      context: .
+      dockerfile: ./fees-reporter/Dockerfile
+      target: production
+    image: fcrs-api
+    depends_on:
+      - fcrs-cache
+      - fcrs-db
+    ports:
+      - 3000:3000
+    environment:
+      LOG_LEVEL: 'info'
+      REDIS_ENDPOINT: 'fcrs-cache:6379'
+      REDIS_PASSWORD: 'hSy2TiQFw8Yyzs4oxqjzwvoM'
+    links:
+      - fcrs-cache
+      - fcrs-db
+    volumes:
+      - fcrs_data:/fcrs/data:rw
+    networks:
+      - fcrs-network
+
+  # KV Cache
+  fcrs-cache:
+    container_name: fcrs-cache
+    image: redis:7.2.3-alpine3.18
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass hSy2TiQFw8Yyzs4oxqjzwvoM
+    volumes: 
+      - db_data:/fcrs/cache:rw
+    networks:
+      - fcrs-network
+
+  # Database
+  fcrs-db:
+    image: mongo:7.0.6
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - db_data:/fcrs/db:rw
+    networks:
+      - fcrs-network
