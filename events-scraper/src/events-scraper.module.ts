@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { KindagooseModule, SchemaRegistrationOptions } from 'kindagoose'
+import { KindagooseModule } from 'kindagoose'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
 import {
   EventScrapingChainConfigPersistence,

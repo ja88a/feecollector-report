@@ -59,13 +59,15 @@ export class FeeCollectorEventsScraper {
 
     // Scrape the fee collected events through batches of block scanning
     let countCollectedEvents = 0
-    const batchSize = 100
+    const batchSize = 1000
     let blockStart = lastScannedBlockNb + 1
     while (blockStart <= chainLastBlockNb) {
       let blockEnd = blockStart + batchSize
       if (blockEnd > chainLastBlockNb) {
         blockEnd = chainLastBlockNb
       }
+
+      this.logger.debug(`Processing ${chainKey} blocks from ${blockStart} to ${blockEnd}`)
 
       // Load the onchain events
       const feeCollectedEvents = await this.loadFeeCollectorEvents(
@@ -96,11 +98,11 @@ export class FeeCollectorEventsScraper {
         blockEnd
       )
       
-      // Update the block number to scan
-      blockStart = blockEnd
+      // Update the start block number to scan the next batch of blocks
+      blockStart = blockEnd + 1
     }
 
-    this.logger.info(`${countCollectedEvents} FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped successfully`)
+    this.logger.info(`${countCollectedEvents} FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped successfully from chain '${chainKey}'`)
   }
 
   /**
