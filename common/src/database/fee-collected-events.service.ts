@@ -49,6 +49,18 @@ export class FeeCollectedEventPersistence {
       })
   }
 
+  /**
+   * Retrieve the FeeCollected events for a given integrator
+   * @param integratorId Unique ID, hex address, of the integrator
+   * @returns the list of FeeCollected events stored in the database for the given integrator
+   */
+  async retrieveFeeCollectedEventsByIntegrator(integratorId: string): Promise<FeeCollectedEventParsed[]> {
+    const feeCollectedEvents = await this.feeCollectedEventModel.find({ integrator: integratorId })
+    return feeCollectedEvents.map((feeCollectedEvent) => {
+      return this.convertFromDoc(feeCollectedEvent)
+    })
+  }
+
   /** Mapping utilty method: Convert an external data model to a doc entry */
   private convertToDoc(feeCollectedEvent: FeeCollectedEventParsed): FeeCollectedEvent {
     return {
