@@ -17,8 +17,11 @@ import { KindagooseModule } from 'kindagoose'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory(configService: ConfigService) {
+        const mongoDbConnectUri = configService.get('MONGODB_USERNAME')
+          ? `${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`
+          : `${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`
         return {
-          uri: 'mongodb://localhost:27017/fcrs', //`${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`,
+          uri: mongoDbConnectUri,
         }
       },
     }),

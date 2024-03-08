@@ -9,6 +9,12 @@ import {
   FeeCollectedEvent,
 } from 'feecollector-report-common'
 
+/**
+ * FeeCollector events scraping main module.
+ *
+ * It featuring a database connector and data persistence services,
+ * and a config module for the configuration of the scraping session.
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true, isGlobal: true }),
@@ -16,8 +22,11 @@ import {
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory(configService: ConfigService) {
+        const mongoDbConnectUri = configService.get('MONGODB_USERNAME')
+          ? `${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`
+          : `${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`
         return {
-          uri: 'mongodb://localhost:27017/fcrs' //`${configService.get('MONGODB_PROTOCOL')}://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@${configService.get('MONGODB_HOST')}:${configService.get('MONGODB_PORT')}/${configService.get('MONGODB_DEFAULT_DATABASE')}`,
+          uri: mongoDbConnectUri,
         }
       },
     }),

@@ -1,5 +1,6 @@
 import { BlockTag } from '@ethersproject/abstract-provider'
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config/dist/config.service'
 import { BigNumber, ethers } from 'ethers'
 import {
   FeeCollectorChainConfig,
@@ -27,6 +28,8 @@ export class FeeCollectorEventsScraper {
   })
 
   constructor(
+    /** Config settings service */
+    private readonly configService: ConfigService,
     /** DB connector for the EventScrapingChain config */
     private eventScrapingChainConfigPersistence: EventScrapingChainConfigPersistence,
     /** DB connector for the FeeCollected events */
@@ -38,7 +41,7 @@ export class FeeCollectorEventsScraper {
    *
    * @param chainKey Unique LiFi key of the target blockchain hosting the Lifi FeeCollector contract
    */
-  public async scrapFeeCollectorEvents(chainKey: string): Promise<void> {
+  public async scrapFeeCollectorEvents(chainKey: string): Promise<string> {
     // Get the target FeeCollector chain configuration
     const feeCollectorChainConfig = await this.retrieveFeeCollectorChainConfig(chainKey)
 
@@ -59,7 +62,7 @@ export class FeeCollectorEventsScraper {
 
     // Scrape the fee collected events through batches of block scanning
     let countCollectedEvents = 0
-    const batchSize = 1000
+    const batchSize = this.configService.get('SCRAPER_BLOCKS_BATCH_SIZE')
     let blockStart = lastScannedBlockNb + 1
     while (blockStart <= chainLastBlockNb) {
       let blockEnd = blockStart + batchSize
@@ -102,7 +105,9 @@ export class FeeCollectorEventsScraper {
       blockStart = blockEnd + 1
     }
 
-    this.logger.info(`${countCollectedEvents} FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped successfully from chain '${chainKey}'`)
+    const resMsg = `${countCollectedEvents} new FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped ${countCollectedEvents>1?'successfully ':' '}from chain '${chainKey}'`
+    this.logger.info(resMsg)
+    return resMsg
   }
 
   /**

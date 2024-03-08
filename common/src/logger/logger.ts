@@ -5,6 +5,18 @@ import { DailyRotateFile } from 'winston/lib/winston/transports'
 
 import { EConfigRunMode, LOGGER } from '../config'
 
+
+/** Supported log levels */
+const enum EConfigLogLevel {
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  default = INFO,
+}
+
+const logLevel = process.env.LOGS_LEVEL || EConfigLogLevel.default
+
 /**
  * WinstonJS Logger integration
  *
@@ -13,7 +25,7 @@ import { EConfigRunMode, LOGGER } from '../config'
  * Integrates an automatic Daily File Rotation for local log files and a retention policy over time
  */
 const logger = createLogger({
-  level: 'info',
+  level: logLevel,
   exitOnError: true, // Default is `true` for not interfering
   format: format.combine(
     format.timestamp({
@@ -35,7 +47,7 @@ const logger = createLogger({
     // - Write all logs with importance level of `info` or less to `combined.log`
     new DailyRotateFile({
       filename: LOGGER.OUTPUT_DIR + 'combined-%DATE%.log',
-      level: 'info',
+      level: logLevel,
       datePattern: LOGGER.FILE_DATE_PATTERN,
       zippedArchive: true,
       maxSize: '50m',
@@ -79,7 +91,7 @@ if (process.env.NODE_ENV !== EConfigRunMode.PROD) {
 
   logger.add(
     new transports.Console({
-      level: 'info',
+      level: logLevel,
       format: alignedWithColorsAndTime,
       handleExceptions: true,
     })

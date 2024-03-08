@@ -1,6 +1,6 @@
-# LiFi FeeCollector Off-chain Reporter
+# LiFi FeeCollector Events Reporter
 
-## Description
+## Overview
 
 ### Purpose
 
@@ -10,13 +10,15 @@ This is a mono-repository for developing and running 2 main backend services, on
 
 2. A backend REST/json API to report the fees collected by the integrators of the LiFi protocol
 
+A database stores and indexes the collected onchain events, as well as the supported chains' configuration. The scraper feeds it while the reporter consumes its data, towards clients.
+
 ### Technical Stack
 
 The `FeeCollected` events are stored in a [MongoDB](https://mongodb.com/) database/cluster. [Typegoose](https://typegoose.github.io/typegoose/) is used, on top of the [Mongoose](https://mongoosejs.com/) ODM, as well as the [GrapeoffJS/kindagoose](https://github.com/GrapeoffJS/kindagoose) for the NestJS integration.
 
 The [NestJS](https://github.com/nestjs/nest) development framework is used as one of the main foundation of these backend modules.
 
-The [Serverless](https://serverless.com/) tooling is used for developing the events scraper to be locally ran and deployed, for instance as AWS Lambda functions.
+The [Serverless](https://serverless.com/) framework/tooling is used for developing locally the events scraper and deploying the functions, for instance on AWS Lambda.
 
 ## Installation
 
@@ -50,7 +52,7 @@ cd ./events-scraper && pnpm start
 
 The default target blockchain is then 'Polygon mainnet' (key: `pol`), and the target LiFi FeeCollector contract is [`0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9`](https://polygonscan.com/address/0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9#events)
 
-*Alternatively* you can use the local Serverless offline runtime framework, run:
+_Alternatively_ you can use the local Serverless offline runtime framework, run:
 
 ```bash
 cd ./events-scraper && pnpm serverless offline
@@ -58,7 +60,7 @@ cd ./events-scraper && pnpm serverless offline
 
 Then you can trigger the scraping function using a GET request [`http://localhost:3003/dev/collectedfees/scrap/{chainKey}`](http://localhost:3003/dev/collectedfees/scrap/pol)
 
-### Start the Fee Reporter API
+### Start the Collected Fees Reporter API
 
 For locally running the backend, run:
 

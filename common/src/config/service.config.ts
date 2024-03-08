@@ -22,11 +22,6 @@ export const MS_CONFIG = {
   PORT_EXPOSED: 3000,
 
   /**
-   * Specify if the server app should automatically shutdown by default, when the service gets inactive
-   */
-  EXIT_ON_STOP: false,
-
-  /**
    * Publish or not (`false`) the OpenAPI REST API specifications
    */
   OPENAPI_PUBLISH: false,
