@@ -1,30 +1,37 @@
 import { Injectable } from '@nestjs/common'
-import {
-  EventScrapingChainConfigPersistence,
-  FeeCollectedEventPersistence,
-} from 'feecollector-report-common'
-import { ChainTokenAmount, IntegratorCollectedFeesReport } from './dto/IntegratorCollectedFees'
-import { BigNumber } from 'ethers/lib/ethers'
+import { FeeCollectedEventPersistence } from 'feecollector-report-common'
+import { ChainTokenFeesBN, IntegratorCollectedFeesReport } from './dto/IntegratorCollectedFees'
+import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
 
-interface ChainTokenFeesBN {
-  chainKey: string
-
-  token: string
-
-  amount: BigNumber
-}
-
+/**
+ * Collected Fees reporting service
+ */
 @Injectable()
 export class FeesReporterService {
+
+  /** Logger */
+  private readonly logger = Logger.child({
+    label: FeesReporterService.name,
+  })
+
   constructor(
-    private readonly eventScrapingChainConfigPersistence: EventScrapingChainConfigPersistence,
+    //  private readonly eventScrapingChainConfigPersistence: EventScrapingChainConfigPersistence,
     private readonly feeCollectedEventPersistence: FeeCollectedEventPersistence
   ) {}
 
+  async init(): Promise<void> {
+    this.logger.debug(`Initializing FeesReporterService`)
+  }
+
+  async shutdown(signal: string): Promise<void> {
+    this.logger.info(`Shutting down the Service on signal ${signal}`)
+  }
+
   /**
-   * Retreieve the FeeCollected events for a given integrator
+   * Retrieve the FeeCollected events for a given integrator
    * from the persistence layer and summarise them in a report
    * @param integratorId
+   * @returns A report of the collected fees by the integrator
    */
   async reportCollectedFees(integratorId: string): Promise<IntegratorCollectedFeesReport> {
     const integratorFeeCollectedEvents =
@@ -61,7 +68,7 @@ export class FeesReporterService {
       }
     }
 
-    // Convert the collected fees into a report
+    // Convert the collected fees into an exportable JSON report
     return {
       integrator: integratorId,
       integratorCollectedFees: Array.from(collectedFeesIntegrator.values()).map((value) => ({

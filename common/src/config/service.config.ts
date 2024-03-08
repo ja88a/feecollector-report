@@ -29,7 +29,7 @@ export const MS_CONFIG = {
   /**
    * Publish or not (`false`) the OpenAPI REST API specifications
    */
-  OPENAPI_PUBLISH: true,
+  OPENAPI_PUBLISH: false,
 }
 
 /**
