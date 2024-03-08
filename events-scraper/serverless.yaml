@@ -12,13 +12,13 @@ functions:
   scrapFeeCollectorEvents:
     handler: dist/main.scrapFeeCollectorEvents
     events:
-      - http:
+      - http: 
+          path: collectedfees/scrap/{chain}
           method: GET
-          path: /chain/{id}
           request:
             parameters:
               paths:
-                id: 'pol'
+                chain: true
 
 provider:
   name: aws

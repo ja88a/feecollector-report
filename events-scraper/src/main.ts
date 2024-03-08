@@ -6,55 +6,47 @@ import { Callback, Context, Handler } from 'aws-lambda'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
 
 /**
- * Serverless handler for the FeeCollectorEventsScraper function.
- * @param event 
- * @param _context 
- * @param _callback 
- * @returns 
+ * Serverless Function handler for the FeeCollectorEventsScraper main
+ * function / entry point to initiate an event scraping session of
+ * onchain FeeCollected events against the specified blockchain.
+ * 
+ * @param event The triggering HTTP event from an API Gateway
+ * @param _context Execution context of the function runtime environment
+ * @param _callback Callback injected to this function to forward its response
+ * @returns response status and body message
  */
 export const scrapFeeCollectorEvents: Handler = async (
   event: any,
   _context: Context,
   _callback: Callback
 ) => {
-  const appContext = await NestFactory.createApplicationContext(EventsScraperModule)
-  const appService = appContext.get(FeeCollectorEventsScraper)
   const { chain } = event.pathParameters
-  try {
-    const res = await appService.scrapFeeCollectorEvents(chain)
-    return {
-      statusCode: HttpStatus.OK,
-      body: JSON.stringify(res),
-    }
-  } catch (error: any) {
-    console.log(error)
-    return {
-      statusCode: HttpStatus.BAD_REQUEST,
-      body: JSON.stringify(error.response ?? error.message),
-    }
-  }
+  return await startScraping(chain)
 }
 
 /**
- * Local dev entry point for the FeeCollectorEventsScraper function.
+ * Initiates the FeeCollectorEventsScraper service and starts a blockchain scanning session.
+ * @param chainKey the key of the blockchain to scan
+ * @returns an http-based response status and body message
  */
-async function bootstrap() {
+async function startScraping(chainKey: string) {
   const appContext = await NestFactory.createApplicationContext(EventsScraperModule)
   const appService = appContext.get(FeeCollectorEventsScraper)
-  const chain = 'pol'
   try {
-    const res = await appService.scrapFeeCollectorEvents(chain)
+    const res = await appService.scrapFeeCollectorEvents(chainKey)
     return {
       statusCode: HttpStatus.OK,
       body: JSON.stringify(res),
     }
   } catch (error: any) {
-    console.log(error)
+    console.error(error)
     return {
-      statusCode: HttpStatus.BAD_REQUEST,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       body: JSON.stringify(error.response ?? error.message),
     }
   }
-
 }
-bootstrap();
+
+// Local dev entry point emulating the launch of the `FeeCollectorEventsScraper` function.
+// For automated local launch only - has no effect on a serverless deployment
+startScraping('pol');
