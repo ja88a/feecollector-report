@@ -5,9 +5,11 @@
   "main": "index.js",
   "private": true,
   "scripts": {
+    "project:init": "git submodule init && pnpm install && pnpm -r build",
     "serverless:offline": "serverless events-scraper:offline",
     "serverless:deploy": "serverless deploy",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "docker compose up",
+    "test": "pnpm -r test"
   },
   "keywords": [],
   "author": "",

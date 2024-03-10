@@ -16,9 +16,11 @@ A database stores and indexes the collected onchain events, as well as the suppo
 
 The `FeeCollected` events are stored in a [MongoDB](https://mongodb.com/) database/cluster. [Typegoose](https://typegoose.github.io/typegoose/) is used, on top of the [Mongoose](https://mongoosejs.com/) ODM, as well as the [GrapeoffJS/kindagoose](https://github.com/GrapeoffJS/kindagoose) for the NestJS integration.
 
-The [NestJS](https://github.com/nestjs/nest) development framework is used as one of the main foundation of these backend modules.
+The [NestJS](https://github.com/nestjs/nest) development framework is used as one of the main foundation for developing the backend modules.
 
-The [Serverless](https://serverless.com/) framework/tooling is used for developing locally the events scraper and deploying the functions, for instance on AWS Lambda.
+The [Serverless](https://serverless.com/) framework/tooling is used for developing locally the events scraper and deploying the functions on AWS Lambda for instance.
+
+[Docker](https://docker.com) containers are used for packaging and for easily managing the composition of servers to run locally.
 
 ## Installation
 
@@ -29,20 +31,41 @@ The [Serverless](https://serverless.com/) framework/tooling is used for developi
 To install all the necessary packages and tooling dependencies, run:
 
 ```bash
-pnpm install
+pnpm project:init
+```
+
+Which is equivalent to the following individual commands:
+
+```bash
+# Init the Git submodule(s) - LiFi contract types
+$ git submodule init
+
+# Install all package dependencies
+$ pnpm install
+
+# Build / tsc compilation to sub dirs `dist`
+$ pnpm -r build
 ```
 
 ## Running the Apps Locally
 
 ### Start MongoDB via Docker Compose
 
-Run locally a Mongo Database:
+Run locally only the Mongo Database:
 
 ```bash
 docker compose up fcrs-db
 ```
 
-### Initiate an Events Scraping session
+Run locally the CollectedFees Reporter API, a Mongo DB and a Redis cache server:
+
+```bash
+docker compose up
+```
+
+Note that the events scraper remains to be manually started.
+
+### Start an Events Scraping session
 
 The blocks of the specified target blockchain are scanned and the found `FeeCollector.FeeCollected` events are imported into MongoDB.
 
@@ -62,7 +85,7 @@ Then you can trigger the scraping function using a GET request [`http://localhos
 
 ### Start the Collected Fees Reporter API
 
-For locally running the backend, run:
+For locally running the service, run:
 
 ```bash
 cd ./fees-reporter && pnpm start
