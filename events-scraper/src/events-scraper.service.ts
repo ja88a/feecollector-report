@@ -61,6 +61,35 @@ export class FeeCollectorEventsScraper {
     )
 
     // Scrape the fee collected events through batches of block scanning
+    let countCollectedEvents = await this.extractAndStoreBlockEvents(
+      lastScannedBlockNb,
+      chainLastBlockNb,
+      feeCollectorContract,
+      feeCollectorChainConfig
+    )
+
+    const resMsg = `${countCollectedEvents} new FeeCollectedEvent${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 1 ? 'successfully ' : ' '}from chain '${chainKey}'`
+    this.logger.info(resMsg)
+    return resMsg
+  }
+
+  /**
+   * Scrapes FeeCollector.FeeCollected events from the blockchain blocks, starting from the last scanned block until last one.
+   * Operates in batches of blocks, to reduce the number of calls to the RPC provider, the data post-processing & its DB storage.
+   * @param lastScannedBlockNb The last block number that was scanned.
+   * @param chainLastBlockNb The last block number of the chain.
+   * @param chainKey The unique key of the chain.
+   * @param feeCollectorContract The FeeCollector contract instance.
+   * @param feeCollectorChainConfig The FeeCollector chain configuration.
+   * @returns The number of FeeCollected events that were scraped.
+   */
+  private async extractAndStoreBlockEvents(
+    lastScannedBlockNb: number,
+    chainLastBlockNb: number,
+    feeCollectorContract: ethers.Contract,
+    feeCollectorChainConfig: FeeCollectorChainConfig
+  ) {
+    const chainKey = feeCollectorChainConfig.chainKey || ''
     let countCollectedEvents = 0
     const batchSize = this.configService.get('SCRAPER_BLOCKS_BATCH_SIZE')
     let blockStart = lastScannedBlockNb + 1
@@ -80,7 +109,9 @@ export class FeeCollectorEventsScraper {
       )
 
       if (feeCollectedEvents.length > 0) {
-        this.logger.info(`Found ${feeCollectedEvents.length} FeeCollectedEvent${feeCollectedEvents.length>1?'s':''} (last block ${blockEnd})`)
+        this.logger.info(
+          `Found ${feeCollectedEvents.length} FeeCollectedEvent${feeCollectedEvents.length > 1 ? 's' : ''} (last block ${blockEnd})`
+        )
 
         // Parse the fee collected events
         const feeCollectedEventsParsed = this.parseFeeCollectorEvents(
@@ -100,14 +131,11 @@ export class FeeCollectorEventsScraper {
         feeCollectorChainConfig.docId || '',
         blockEnd
       )
-      
+
       // Update the start block number to scan the next batch of blocks
       blockStart = blockEnd + 1
     }
-
-    const resMsg = `${countCollectedEvents} new FeeCollectedEvent${countCollectedEvents>1?'s':''} scraped ${countCollectedEvents>1?'successfully ':' '}from chain '${chainKey}'`
-    this.logger.info(resMsg)
-    return resMsg
+    return countCollectedEvents
   }
 
   /**

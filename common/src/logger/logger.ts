@@ -5,7 +5,6 @@ import { DailyRotateFile } from 'winston/lib/winston/transports'
 
 import { EConfigRunMode, LOGGER } from '../config'
 
-
 /** Supported log levels */
 const enum EConfigLogLevel {
   DEBUG = 'debug',
@@ -15,7 +14,7 @@ const enum EConfigLogLevel {
   default = INFO,
 }
 
-const logLevel = process.env.LOGS_LEVEL || EConfigLogLevel.default
+const logsMinLevel = process.env.LOG_LEVEL || EConfigLogLevel.default
 
 /**
  * WinstonJS Logger integration
@@ -25,7 +24,7 @@ const logLevel = process.env.LOGS_LEVEL || EConfigLogLevel.default
  * Integrates an automatic Daily File Rotation for local log files and a retention policy over time
  */
 const logger = createLogger({
-  level: logLevel,
+  level: logsMinLevel,
   exitOnError: true, // Default is `true` for not interfering
   format: format.combine(
     format.timestamp({
@@ -47,7 +46,7 @@ const logger = createLogger({
     // - Write all logs with importance level of `info` or less to `combined.log`
     new DailyRotateFile({
       filename: LOGGER.OUTPUT_DIR + 'combined-%DATE%.log',
-      level: logLevel,
+      level: logsMinLevel,
       datePattern: LOGGER.FILE_DATE_PATTERN,
       zippedArchive: true,
       maxSize: '50m',
@@ -55,11 +54,11 @@ const logger = createLogger({
     }),
     // // AWS CloudWatch connector -> requires `winston-aws-cloudwatch`
     // new CloudWatchLogsTransport({
-    //   logGroupName: 'my-log-group',
-    //   logStreamName: 'my-log-stream',
+    //   logGroupName: 'feescollector-log-group',
+    //   logStreamName: 'feescollector-scraper-log-stream',
     //   awsAccessKeyId: 'my-access-key-id',
     //   awsSecretKey: 'my-secret-key',
-    //   awsRegion: 'us-east-1'
+    //   awsRegion: 'eu-west-3'
     // }),
   ],
   exceptionHandlers: [
@@ -91,7 +90,7 @@ if (process.env.NODE_ENV !== EConfigRunMode.PROD) {
 
   logger.add(
     new transports.Console({
-      level: logLevel,
+      level: logsMinLevel,
       format: alignedWithColorsAndTime,
       handleExceptions: true,
     })
