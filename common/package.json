@@ -2,8 +2,12 @@
   "name": "feecollector-report-common",
   "version": "0.1.0",
   "description": "Sets of data and utilities used by the FeeCollector offchain services.",
-  "main": "dist/index",
-  "types": "dist/index",
+  "main": "./dist/index",
+  "module": "./dist/index.js",
+  "types": "./dist/index",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "nest build",
     "build:watch": "nest build --watch",

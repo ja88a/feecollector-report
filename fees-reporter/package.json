@@ -1,5 +1,5 @@
 {
-  "name": "feecollector-service-reporter",
+  "name": "feecollector-report-api",
   "version": "0.1.0",
   "description": "LiFi offchain services: FeeCollector Reporter API",
   "author": "",
@@ -7,6 +7,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "build": "nest build",
+    "docker:build": "docker compose up fcrs-report --build --force-recreate --remove-orphans",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

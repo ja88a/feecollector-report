@@ -12,19 +12,24 @@ networks:
 services:
   # FeeCollector Reporter API service
   fcrs-report:
-    container_name: fcrs-api
+    container_name: fcrs-report
     build:
       context: .
-      dockerfile: ./fees-reporter/Dockerfile
-      target: production
-    image: fcrs-api
+      dockerfile: ./Dockerfile
+      target: fees-reporter
+    image: fcrs-report
     depends_on:
       - fcrs-cache
       - fcrs-db
     ports:
       - 3000:3000
     environment:
-      LOG_LEVEL: 'info'
+      NODE_ENV: production
+      LOG_LEVEL: info # warn
+      MONGODB_PROTOCOL: mongodb
+      MONGODB_HOST: fcrs-db
+      MONGODB_PORT: 27017
+      MONGODB_DEFAULT_DATABASE: fcrs
       REDIS_ENDPOINT: 'fcrs-cache:6379'
       REDIS_PASSWORD: 'hSy2TiQFw8Yyzs4oxqjzwvoM'
     links:

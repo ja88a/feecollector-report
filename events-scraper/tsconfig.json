@@ -4,6 +4,6 @@
     "outDir": "./dist",
     "baseUrl": ".",
   },
-  "include": ["src", "test", "../common/src/data/FeeCollectedEventParsed.ts"],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]
 }

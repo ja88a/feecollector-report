@@ -1,15 +1,9 @@
 {
-  "name": "feecollector-service-monorepo-root",
+  "name": "feecollector-report-monorepo",
   "version": "0.1.0",
   "description": "Mono-repository Root of the LiFi FeeCollector Reporter offchain services",
   "main": "index.js",
   "private": true,
-  "workspaces": [
-    "common",
-    "events-scraper",
-    "fees-reporter",
-    "externals/lifi-contract-types"
-  ],
   "scripts": {
     "serverless:offline": "serverless events-scraper:offline",
     "serverless:deploy": "serverless deploy",
