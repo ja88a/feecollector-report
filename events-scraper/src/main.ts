@@ -4,12 +4,17 @@ import { EventsScraperModule } from './events-scraper.module'
 import { HttpStatus } from '@nestjs/common'
 import { Callback, Context, Handler } from 'aws-lambda'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
+import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
+
+const logger = Logger.child({
+  label: FeeCollectorEventsScraper.name,
+})
 
 /**
  * Serverless Function handler for the FeeCollectorEventsScraper main
  * function / entry point to initiate an event scraping session of
  * onchain FeeCollected events against the specified blockchain.
- * 
+ *
  * @param event The triggering HTTP event from an API Gateway
  * @param _context Execution context of the function runtime environment
  * @param _callback Callback injected to this function to forward its response
@@ -36,17 +41,23 @@ async function startScraping(chainKey: string) {
     const res = await appService.scrapFeeCollectorEvents(chainKey)
     return {
       statusCode: HttpStatus.OK,
-      body: JSON.stringify(res),
+      body: res,
     }
   } catch (error: any) {
-    console.error(error)
+    const msgGenericMsg = `ERROR Scraping FeeCollector Events for chain '${chainKey}' failed`
+    logger.error(`${msgGenericMsg} - Events Scraping session ABORTED\n`, error)
     return {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      body: JSON.stringify(error.response ?? error.message),
+      body: {
+        message: msgGenericMsg,
+      // error: JSON.stringify(error.response ?? error.message)
+      },
     }
   }
 }
 
 // Local dev entry point emulating the launch of the `FeeCollectorEventsScraper` function.
 // For automated local launch only - has no effect on a serverless deployment
-startScraping('pol');
+startScraping('pol')
+  .then((res) => logger.info(`Result: ${JSON.stringify(res)}`))
+  .finally(() => process.exit())

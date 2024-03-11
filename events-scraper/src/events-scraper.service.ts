@@ -13,6 +13,7 @@ import {
 } from 'feecollector-report-common/dist/database'
 import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
 import { FeeCollector__factory } from 'lifi-contract-typings'
+import { ResultEventScrapingSession } from './dto/ResultEventScrapingSession.dto'
 
 /**
  * Service for scraping Lifi FeeCollector contracts' events.
@@ -41,9 +42,15 @@ export class FeeCollectorEventsScraper {
    *
    * @param chainKey Unique LiFi key of the target blockchain hosting the Lifi FeeCollector contract
    */
-  public async scrapFeeCollectorEvents(chainKey: string): Promise<string> {
+  public async scrapFeeCollectorEvents(chainKey: string): Promise<ResultEventScrapingSession> {
     // Get the target FeeCollector chain configuration
-    const feeCollectorChainConfig = await this.retrieveFeeCollectorChainConfig(chainKey)
+    const feeCollectorChainConfig = await this.retrieveFeeCollectorChainConfig(chainKey).catch(
+      (error) => {
+        throw new Error(
+          `Failed to retrieve the FeeCollector Scraping Config for chain '${chainKey}'\n${error.stack}`
+        )
+      }
+    )
 
     // Init the virtual contract on the target chain
     const feeCollectorContract = this.initFeeCollectorContract(
@@ -55,22 +62,28 @@ export class FeeCollectorEventsScraper {
     const chainLastBlockNb = await feeCollectorContract.provider.getBlockNumber()
     const lastScannedBlockNb =
       feeCollectorChainConfig.feeCollectorBlockLastScanned ||
-      feeCollectorChainConfig.feeCollectorBlockStart
+      feeCollectorChainConfig.feeCollectorBlockStart - 1
     this.logger.info(
       `Scraping FeeCollector.FeeCollected events on chain '${chainKey}' from block ${lastScannedBlockNb + 1} to last block ${chainLastBlockNb}`
     )
 
-    // Scrape the fee collected events through batches of block scanning
-    let countCollectedEvents = await this.extractAndStoreBlockEvents(
+    // Scrape the fee collected events through batches of blocks scanning
+    const countCollectedEvents = await this.extractAndStoreBlockEvents(
       lastScannedBlockNb,
       chainLastBlockNb,
       feeCollectorContract,
       feeCollectorChainConfig
-    )
+    ).catch((error) => {
+      throw new Error(`Failed to extract and store events from chain '${chainKey}'\n${error.stack}`)
+    })
 
-    const resMsg = `${countCollectedEvents} new FeeCollectedEvent${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 1 ? 'successfully ' : ' '}from chain '${chainKey}'`
+    const resMsg = `${countCollectedEvents} new FeeCollected Event${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 0 ? 'successfully ' : ''}from chain '${chainKey}'`
     this.logger.info(resMsg)
-    return resMsg
+    return {
+      message: resMsg,
+      eventsNew: countCollectedEvents,
+      blocksScanned: chainLastBlockNb - lastScannedBlockNb,
+    }
   }
 
   /**
@@ -91,7 +104,7 @@ export class FeeCollectorEventsScraper {
   ) {
     const chainKey = feeCollectorChainConfig.chainKey || ''
     let countCollectedEvents = 0
-    const batchSize = this.configService.get('SCRAPER_BLOCKS_BATCH_SIZE')
+    const batchSize: number = +this.configService.get('SCRAPER_BLOCKS_BATCH_SIZE')
     let blockStart = lastScannedBlockNb + 1
     while (blockStart <= chainLastBlockNb) {
       let blockEnd = blockStart + batchSize
@@ -99,7 +112,9 @@ export class FeeCollectorEventsScraper {
         blockEnd = chainLastBlockNb
       }
 
-      this.logger.debug(`Processing ${chainKey} blocks from ${blockStart} to ${blockEnd}`)
+      this.logger.debug(
+        `Processing blocks of '${chainKey}' from ${blockStart} to ${blockEnd} (batchSize: ${batchSize})`
+      )
 
       // Load the onchain events
       const feeCollectedEvents = await this.loadFeeCollectorEvents(
