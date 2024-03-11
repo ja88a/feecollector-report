@@ -2,6 +2,17 @@
   "name": "feecollector-report-common",
   "version": "0.1.0",
   "description": "Sets of data and utilities used by the FeeCollector offchain services.",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/feecollector-report",
+    "type": "git"
+  },
+  "keywords": [],
+  "license": "AGPL-3.0-only",
   "main": "./dist/index",
   "module": "./dist/index",
   "types": "./dist/index",
@@ -19,9 +30,6 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "AGPL-3.0-only",
   "dependencies": {
     "@lifi/types": "^11.3.0",
     "@nestjs/common": "^10.3.3",

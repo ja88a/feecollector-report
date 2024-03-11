@@ -1,8 +1,18 @@
 {
   "name": "feecollector-report-monorepo",
   "version": "0.1.0",
-  "description": "Mono-repository Root of the LiFi FeeCollector Reporter offchain services",
-  "main": "index.js",
+  "description": "Mono-repository of LiFi FeeCollector Events Reporting Services - offchain",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://github.com/ja88a"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/feecollector-report",
+    "type": "git"
+  },
+  "keywords": ["lifi", "feecollector", "report", "offchain", "services", "events"],
+  "license": "AGPL-3.0-only",
   "private": true,
   "scripts": {
     "project:init": "git submodule init && pnpm install && pnpm -r build",
@@ -11,12 +21,13 @@
     "start": "docker compose up",
     "test": "pnpm -r test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "AGPL-3.0-only",
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",
     "serverless": "^3.38.0",
-    "@serverless/compose": "^1.3.0"
+    "@serverless/compose": "^1.3.0",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   }
 }
