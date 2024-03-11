@@ -3,17 +3,18 @@
   "root": ".",
   "sourceRoot": "./src",
   "compilerOptions": {
-    "webpack": true,
     "tsConfigPath": "./tsconfig.base.json"
   },
   "projects": {
     "common": {
       "type": "module",
       "root": "common",
-      "entryFile": "main",
+      "entryFile": "index",
       "sourceRoot": "common/src",
       "compilerOptions": {
-        "tsConfigPath": "common/tsconfig.json"
+        "webpack": true,
+        "tsConfigPath": "common/tsconfig.build.json",
+        "webpackConfigPath": "common/webpack.config.js"
       }
     },
     "fees-reporter": {
@@ -22,7 +23,7 @@
       "entryFile": "main",
       "sourceRoot": "fees-reporter/src",
       "compilerOptions": {
-        "tsConfigPath": "fees-reporter/tsconfig.json"
+        "tsConfigPath": "fees-reporter/tsconfig.build.json"
       }
     },
     "events-scraper": {
@@ -31,7 +32,7 @@
       "entryFile": "main",
       "sourceRoot": "events-scraper/src",
       "compilerOptions": {
-        "tsConfigPath": "events-scraper/tsconfig.json"
+        "tsConfigPath": "events-scraper/tsconfig.build.json"
       }
     }
   }

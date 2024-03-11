@@ -63,15 +63,18 @@ EXPOSE 3000
 CMD [ "node", "dist/main" ]
 
 
-FROM build-deps-prod AS fees-reporter-prod
+FROM build-assets AS fees-reporter-prod
 # Set NODE_ENV environment variable
 ENV NODE_ENV production
 
 WORKDIR /usr/src/app
-COPY --from=build-assets /usr/scr/app/externals/lifi-contract-types/dist ./externals/lifi-contract-types/dist
-COPY --from=build-assets /usr/scr/app/common/dist ./common/dist
-COPY --from=build-assets /usr/scr/app/fees-reporter/dist ./fees-reporter/dist
 
+RUN --mount=type=cache,id=pnpm-prod,target=/pnpm/store pnpm store prune
+RUN rm -rf **/node_modules
+RUN --mount=type=cache,id=pnpm-prod,target=/pnpm/store pnpm install --prod
+
+RUN rm -rf **/src
+RUN rm ./tsconfig*
 RUN rm -rf **/tsconfig*
 
 WORKDIR /usr/src/app/fees-reporter

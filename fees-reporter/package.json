@@ -2,7 +2,15 @@
   "name": "feecollector-report-api",
   "version": "0.1.0",
   "description": "LiFi offchain services: FeeCollector Reporter API",
-  "author": "",
+  "author": {
+    "name": "Jabba ø1",
+    "email": "jabba@srenault.com",
+    "url": "https://srenault.com"
+  },
+  "repository": {
+    "url": "https://github.com/ja88a/feecollector-report",
+    "type": "git"
+  },
   "private": true,
   "license": "AGPL-3.0-only",
   "scripts": {
@@ -19,7 +27,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "webpack:build": "webpack --config webpack.prod.js",
+    "webpack:start": "node dist/server"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
