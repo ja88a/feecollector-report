@@ -1,8 +1,3 @@
-import mongoose, { ObjectId } from "mongoose"
-import { FeeCollectorChainConfig } from "../config"
-import { EventScrapingChainConfig, FeeCollectedEvent, FeeCollectedEventParsed } from "..";
-import { BigNumber } from "ethers";
-
 /**
  * Utility for managing event scraping information in the database.
  */
@@ -18,7 +13,6 @@ export class EventScrapingUtils {
   static computeIdEventScrapingFeeCollector(chainKey: string): string {
     return this.idPrefixEventScrapingInfo + '_' + this.idPrefixContractFeeCollector + '_' + chainKey
   }
-
 }
 
 /**

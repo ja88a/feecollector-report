@@ -13,9 +13,9 @@
   },
   "keywords": [],
   "license": "AGPL-3.0-only",
-  "main": "./dist/index",
-  "module": "./dist/index",
-  "types": "./dist/index",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
