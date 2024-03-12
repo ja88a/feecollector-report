@@ -1,3 +1,5 @@
+org: jabba01
+app: lifi-feecollector-events-scraper
 service: lifi-feecollector-events-scraper
 
 plugins:

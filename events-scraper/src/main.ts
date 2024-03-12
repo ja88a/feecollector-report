@@ -26,9 +26,8 @@ export const scrapFeeCollectorEvents: Handler = async (
   _callback: Callback
 ) => {
   const { chain } = event.pathParameters
-  return await startScraping(chain).then((resolvedResult) => {
-    return JSON.stringify(resolvedResult)
-  })
+  logger.debug(`Lambda Invoked for Scraping events for chain '${chain}' - Context: ${JSON.stringify(_context)}`)
+  return await startScraping(chain)
 }
 
 /**
@@ -43,7 +42,7 @@ async function startScraping(chainKey: string) {
     const res = await appService.scrapFeeCollectorEvents(chainKey)
     return {
       statusCode: HttpStatus.OK,
-      body: res,
+      body: JSON.stringify(res),
     }
   } catch (error: any) {
     const msgGenericMsg = `ERROR Scraping FeeCollector Events for chain '${chainKey}' failed`
@@ -51,7 +50,7 @@ async function startScraping(chainKey: string) {
     return {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       body: {
-        message: msgGenericMsg,
+        message: JSON.stringify(msgGenericMsg),
         // error: error.response ?? error.message
       },
     }
@@ -60,6 +59,8 @@ async function startScraping(chainKey: string) {
 
 // Local dev entry point emulating the launch of the `FeeCollectorEventsScraper` function.
 // For automated local launch only - has no effect on a serverless deployment
-startScraping('pol')
-  .then((res) => logger.info(`Result: ${JSON.stringify(res)}`))
-  .finally(() => process.exit())
+if (process.env.DEV_MODE === '1') {
+  startScraping('pol')
+    .then((res) => logger.info(`Result: ${JSON.stringify(res)}`))
+    .finally(() => process.exit())
+}

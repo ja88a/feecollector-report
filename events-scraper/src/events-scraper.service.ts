@@ -112,7 +112,7 @@ export class FeeCollectorEventsScraper {
       }
 
       this.logger.debug(
-        `Processing blocks of '${chainKey}' from ${blockStart} to ${blockEnd} (batchSize: ${batchSize})`
+        `Scanning blocks of '${chainKey}' from ${blockStart} to ${blockEnd} (batch size: ${blockEnd-blockStart+1})`
       )
 
       // Load the onchain events
