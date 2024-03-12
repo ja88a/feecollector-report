@@ -14,6 +14,8 @@ A database stores and indexes the collected onchain events, as well as the suppo
 
 ### Technical Stack
 
+![Deployment architecture overview](./doc/assets/lifi-feescollector-reporter_arch-overview_v1.png)
+
 The `FeeCollected` events are stored in a [MongoDB](https://mongodb.com/) database/cluster. [Typegoose](https://typegoose.github.io/typegoose/) is used, on top of the [Mongoose](https://mongoosejs.com/) ODM, as well as the [GrapeoffJS/kindagoose](https://github.com/GrapeoffJS/kindagoose) for the NestJS integration.
 
 The [NestJS](https://github.com/nestjs/nest) development framework is used as one of the main foundation for developing the backend modules.
