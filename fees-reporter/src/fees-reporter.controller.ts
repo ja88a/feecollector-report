@@ -14,7 +14,6 @@ import { exit } from 'node:process'
   version: MS_CONFIG.VERSION_PUBLIC,
   path: 'collectedfees',
 })
-@Controller()
 export class FeesReporterController {
   /** Logger */
   private readonly logger = Logger.child({

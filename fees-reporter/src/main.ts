@@ -29,9 +29,9 @@ async function bootstrap() {
   // Extra - Publish this app server's OpenAPI
   if (MS_CONFIG.OPENAPI_PUBLISH) {
     const config = new DocumentBuilder()
-      .setTitle('Account Updates Ingestor')
+      .setTitle('FeesCollector Report API')
       .setDescription(
-        'REST API specifications for the Account Updates Ingestor',
+        'REST API specifications for the Li.Fi Collected Fees Reporter API',
       )
       .setVersion('1.0')
       .build();
