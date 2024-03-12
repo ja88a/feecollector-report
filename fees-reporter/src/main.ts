@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { FeesReporterModule } from './fees-reporter.module'
-import { MS_CONFIG } from 'feecollector-report-common/dist/config'
+import { MS_CONFIG } from 'feecollector-report-common/config'
 import { VersioningType } from '@nestjs/common'
 
 import {

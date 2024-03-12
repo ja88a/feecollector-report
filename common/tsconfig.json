@@ -1,8 +1,15 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "module": "node16",
+    "target": "es2020", // set to the *lowest* target you support
+    "strict": true,
+    "declaration": true,
+    "sourceMap": true,
+    "declarationMap": true,
     "outDir": "./dist",
-    "strictPropertyInitialization": false,
+    "verbatimModuleSyntax": false,
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]

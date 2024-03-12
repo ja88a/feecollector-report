@@ -3,7 +3,7 @@ import { InjectModel } from 'kindagoose'
 import { ReturnModelType } from '@typegoose/typegoose'
 import { FeeCollectedEvent } from './models/FeeCollectedEvent'
 import { FeeCollectedEventParsed } from '../data/FeeCollectedEventParsed'
-import { default as Logger } from '../logger/logger'
+import { Logger } from '../logger/logger'
 import { BigNumber } from 'ethers/lib/ethers'
 
 /**

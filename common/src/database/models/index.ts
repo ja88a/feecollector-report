@@ -1,2 +1,2 @@
-export * from './EventScrapingChainConfig'
-export * from './FeeCollectedEvent'
+export * from './EventScrapingChainConfig.js'
+export * from './FeeCollectedEvent.js'

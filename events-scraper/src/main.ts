@@ -4,7 +4,7 @@ import { EventsScraperModule } from './events-scraper.module'
 import { HttpStatus } from '@nestjs/common'
 import { Callback, Context, Handler } from 'aws-lambda'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
-import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
+import { Logger } from 'feecollector-report-common/logger'
 
 const logger = Logger.child({
   label: FeeCollectorEventsScraper.name,
@@ -26,7 +26,9 @@ export const scrapFeeCollectorEvents: Handler = async (
   _callback: Callback
 ) => {
   const { chain } = event.pathParameters
-  return await startScraping(chain)
+  return await startScraping(chain).then((resolvedResult) => {
+    return JSON.stringify(resolvedResult)
+  })
 }
 
 /**
@@ -50,7 +52,7 @@ async function startScraping(chainKey: string) {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       body: {
         message: msgGenericMsg,
-      // error: JSON.stringify(error.response ?? error.message)
+        // error: error.response ?? error.message
       },
     }
   }

@@ -23,7 +23,7 @@ const logsMinLevel = process.env.LOG_LEVEL || EConfigLogLevel.default
  *
  * Integrates an automatic Daily File Rotation for local log files and a retention policy over time
  */
-const logger = createLogger({
+export const Logger = createLogger({
   level: logsMinLevel,
   exitOnError: true, // Default is `true` for not interfering
   format: format.combine(
@@ -88,7 +88,7 @@ if (process.env.NODE_ENV !== EConfigRunMode.PROD) {
     consoleFormat
   )
 
-  logger.add(
+  Logger.add(
     new transports.Console({
       level: logsMinLevel,
       format: alignedWithColorsAndTime,
@@ -96,5 +96,3 @@ if (process.env.NODE_ENV !== EConfigRunMode.PROD) {
     })
   )
 }
-
-export default logger

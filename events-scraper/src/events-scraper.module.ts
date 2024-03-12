@@ -3,11 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { KindagooseModule } from 'kindagoose'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
 import {
-  EventScrapingChainConfigPersistence,
-  FeeCollectedEventPersistence,
   EventScrapingChainConfig,
+  EventScrapingChainConfigPersistence,
   FeeCollectedEvent,
-} from 'feecollector-report-common'
+  FeeCollectedEventPersistence,
+} from 'feecollector-report-common/database'
 
 /**
  * FeeCollector events scraping main module.

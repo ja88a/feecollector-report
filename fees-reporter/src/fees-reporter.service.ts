@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { FeeCollectedEventPersistence } from 'feecollector-report-common'
 import { ChainTokenFeesBN, IntegratorCollectedFeesReport } from './dto/IntegratorCollectedFees'
-import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
+import { Logger } from 'feecollector-report-common/logger'
+import { FeeCollectedEventPersistence } from 'feecollector-report-common/database'
 
 /**
  * Collected Fees reporting service

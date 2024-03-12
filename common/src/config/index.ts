@@ -1,2 +1,2 @@
-export * from './service.config'
-export * from './fee-collector.config'
+export * from './service.config.js'
+export * from './fee-collector.config.js'

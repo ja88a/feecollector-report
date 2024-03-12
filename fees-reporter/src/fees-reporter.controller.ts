@@ -2,8 +2,8 @@ import { Controller, Get, Param } from '@nestjs/common'
 import { FeesReporterService } from './fees-reporter.service'
 import { IntegratorCollectedFeesReport } from './dto/IntegratorCollectedFees'
 import { ApiParam, ApiTags } from '@nestjs/swagger/dist/decorators'
-import { EProcessExitSignal, MS_CONFIG } from 'feecollector-report-common/dist/config/service.config'
-import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
+import { EProcessExitSignal, MS_CONFIG } from 'feecollector-report-common/config'
+import { Logger } from 'feecollector-report-common/logger'
 import { exit } from 'node:process'
 
 /**

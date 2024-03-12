@@ -1,1 +1,1 @@
-export * from './FeeCollectedEventParsed'
+export * from './FeeCollectedEventParsed.js'

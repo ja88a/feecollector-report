@@ -5,15 +5,15 @@ import { BigNumber, ethers } from 'ethers'
 import {
   FeeCollectorChainConfig,
   feeCollectorChainConfigDefault,
-} from 'feecollector-report-common/dist/config'
-import { FeeCollectedEventParsed } from 'feecollector-report-common/dist/data'
+} from 'feecollector-report-common/config'
 import {
   EventScrapingChainConfigPersistence,
   FeeCollectedEventPersistence,
-} from 'feecollector-report-common/dist/database'
-import { default as Logger } from 'feecollector-report-common/dist/logger/logger'
+} from 'feecollector-report-common/database'
+import { Logger } from 'feecollector-report-common/logger'
 import { FeeCollector__factory } from 'lifi-contract-typings'
 import { ResultEventScrapingSession } from './dto/ResultEventScrapingSession.dto'
+import { FeeCollectedEventParsed } from 'feecollector-report-common/data'
 
 /**
  * Service for scraping Lifi FeeCollector contracts' events.
@@ -52,13 +52,13 @@ export class FeeCollectorEventsScraper {
       }
     )
 
-    // Init the virtual contract on the target chain
+    // Init the virtual onchain contract for the target chain
     const feeCollectorContract = this.initFeeCollectorContract(
       feeCollectorChainConfig.feeCollectorContract,
       feeCollectorChainConfig.rpcUrl
     )
 
-    // Get the chain last block number
+    // Get the chain last block number & where to start from
     const chainLastBlockNb = await feeCollectorContract.provider.getBlockNumber()
     const lastScannedBlockNb =
       feeCollectorChainConfig.feeCollectorBlockLastScanned ||
@@ -77,10 +77,9 @@ export class FeeCollectorEventsScraper {
       throw new Error(`Failed to extract and store events from chain '${chainKey}'\n${error.stack}`)
     })
 
-    const resMsg = `${countCollectedEvents} new FeeCollected Event${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 0 ? 'successfully ' : ''}from chain '${chainKey}'`
-    this.logger.info(resMsg)
+    // Compute the scraping session result
     return {
-      message: resMsg,
+      message: `${countCollectedEvents} new FeeCollected Event${countCollectedEvents > 1 ? 's' : ''} scraped ${countCollectedEvents > 0 ? 'successfully ' : ''}from chain '${chainKey}'`,
       eventsNew: countCollectedEvents,
       blocksScanned: chainLastBlockNb - lastScannedBlockNb,
     }

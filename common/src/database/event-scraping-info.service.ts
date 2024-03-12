@@ -3,7 +3,7 @@ import { InjectModel } from 'kindagoose'
 import { ReturnModelType } from '@typegoose/typegoose'
 import { EventScrapingChainConfig } from './models/EventScrapingChainConfig'
 import { FeeCollectorChainConfig } from '../config/fee-collector.config'
-import { default as Logger } from '../logger/logger'
+import { Logger } from '../logger/logger'
 
 /**
  * Service for storing and retrieving onchain-related scraping information data about FeeCollector events

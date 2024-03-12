@@ -1,3 +1,4 @@
+import { Severity } from '@typegoose/typegoose'
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
@@ -8,7 +9,7 @@ import { prop } from '@typegoose/typegoose/lib/prop'
  */
 @modelOptions({
   schemaOptions: { collection: 'FeeCollectedEvents' },
-  options: { disableCaching: false },
+  options: { disableCaching: false, allowMixed: Severity.ALLOW },
 })
 export class FeeCollectedEvent extends TimeStamps {
   /** The blockchain unique key where the event was emitted */
@@ -19,7 +20,10 @@ export class FeeCollectedEvent extends TimeStamps {
   @prop({ unique: true })
   txHash: string
 
-  /** The block tag when the event was triggered */
+  /** The block tag when the event was triggered
+   * 
+   * Depending on the blockchain, it can consist in a block number or a block hash, 
+   * hence the need for the model option `allowMixed: Severity.ALLOW` */
   @prop()
   blockTag: number | string
 
