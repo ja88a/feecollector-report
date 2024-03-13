@@ -1,8 +1,8 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "node16",
-    "target": "es2020", // set to the *lowest* target you support
+    "module": "node16", // library mode
+    "target": "es2020", // set to the *lowest* target
     "strict": true,
     "declaration": true,
     "sourceMap": true,

@@ -1,3 +1,4 @@
+import { ChainKey } from '@lifi/types'
 import { BigNumber } from 'ethers'
 
 /**
@@ -6,13 +7,13 @@ import { BigNumber } from 'ethers'
  */
 export interface FeeCollectedEventParsed {
   /** Unique blockchain key from which the event come from */
-  chainKey: string
+  chainKey: ChainKey
 
   /** Transaction hash in which context the event was emitted */
   txHash: string
 
   /** Block number when the event was emitted */
-  blockTag: number | string;
+  blockTag: number | string
 
   /** Address of the token that was collected */
   token: string

@@ -3,38 +3,72 @@ import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
 
 /**
- * Schema of the FeeCollector chain configuration document
+ * Configuration settings for the target blockchain to scan
  */
-@modelOptions({
-  schemaOptions: { collection: 'EventScrapingChainConfigs', versionKey: '0' },
-  options: { disableCaching: false },
-})
-export class EventScrapingChainConfig extends TimeStamps {
-  /** the target blockchain key, based on Lifi data types */
-  @prop({ unique: true, index: true })
-  chainKey: string
-
+class ChainProperties {
   /** the target blockchain ID, based on Lifi data types */
   @prop()
-  chainId: number
+  id: number
 
-  /** the chain type, e.g. EVM, based on Lifi data types */
+  /** the chain type, e.g. `EVM`, based on Lifi data types */
   @prop()
-  chainType: string
+  type: string
 
   /** the URL of the JSON RPC provider */
   @prop()
   rpcUrl: string
 
+  /** the chain specific tag enabling to get its last block number */
+  @prop()
+  lastBlockTag: string | number
+}
+
+/**
+ * LiFi FeeCollector contract properties for its onchain scanning.
+ */
+class FeeCollectorProperties {
   /** the address of the Lifi FeeCollector contract */
   @prop()
-  feeCollectorContract: string
+  contract: string
 
   /** the block number from which to start seeking for FeeCollected events */
   @prop()
-  feeCollectorBlockStart: number
+  blockStart: number
 
   /** the number of last scanned block while seeking for onchain events */
   @prop()
-  feeCollectorBlockLastScanned?: number
+  lastScanBlock?: number
+
+  /** Last time a scan of block events was performed, epoch in ms */
+  @prop()
+  lastScanTime?: number
+}
+
+/**
+ * Schema of the FeeCollector's blockchain configuration document
+ */
+@modelOptions({
+  schemaOptions: { collection: 'EventScrapingChainConfigs', versionKey: 'version',  },
+  options: { disableCaching: false },
+})
+export class EventScrapingChainConfig extends TimeStamps {
+  /** Model version number */
+  @prop({ required: true })
+  version: number
+  
+  /** the target blockchain key, based on Lifi data types */
+  @prop({ unique: true, index: true })
+  chainKey: string
+
+  /** the blockchain info */
+  @prop()
+  chain: ChainProperties
+
+  /** the FeeCollector contract info */
+  @prop()
+  feeCollector: FeeCollectorProperties
+
+  /** General status for scraping events on the chain */
+  @prop()
+  status: string
 }

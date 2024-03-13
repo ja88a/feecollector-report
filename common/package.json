@@ -63,7 +63,7 @@
     "test:cov": "jest --coverage"
   },
   "dependencies": {
-    "@lifi/types": "^11.3.0",
+    "@lifi/types": "^11.4.1",
     "@nestjs/common": "^10.3.3",
     "ethers": "^5.7.2",
     "kindagoose": "^1.3.8",
