@@ -1,13 +1,17 @@
+import { HttpStatus, INestApplicationContext } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
-import { EventsScraperModule } from './events-scraper.module'
 
-import { HttpStatus } from '@nestjs/common'
 import { Callback, Context, Handler } from 'aws-lambda'
-import { FeeCollectorEventsScraper } from './events-scraper.service'
+
 import { Logger } from 'feecollector-report-common/logger'
 
+import { EventsScraperModule } from './events-scraper.module'
+import { FeeCollectorEventsScraper } from './events-scraper.service'
+import { ChainKey } from '@lifi/types'
+
+/** Private logger */
 const logger = Logger.child({
-  label: FeeCollectorEventsScraper.name,
+  label: 'EventsScraperMain',
 })
 
 /**
@@ -26,18 +30,51 @@ export const scrapFeeCollectorEvents: Handler = async (
   _callback: Callback
 ) => {
   const { chain } = event.pathParameters
-  logger.debug(`Lambda Invoked for Scraping events for chain '${chain}' - Context: ${JSON.stringify(_context)}`)
-  return await startScraping(chain)
+  logger.debug(`Lambda function invoked for Scraping events from chain '${chain}' - Context: ${JSON.stringify(_context)}`)
+  return await startScraping(chain, _context.awsRequestId)
+}
+
+/** Local persistence of an already created application context - Required for the Lambda function's runtime context */
+let appContext: INestApplicationContext
+
+/** 
+ * Avoid recreating an application context if a previously created one
+ * is still available in the context of the serverless function
+ */
+async function getAppContext(): Promise<INestApplicationContext> {
+  if (appContext == null) {
+    appContext = await NestFactory.createApplicationContext(EventsScraperModule).catch((err) => {
+      logger.error(`Application context has failed to init`, err)
+      return Promise.reject(err)
+    })
+  }
+  return appContext
 }
 
 /**
  * Initiates the FeeCollectorEventsScraper service and starts a blockchain scanning session.
  * @param chainKey the key of the blockchain to scan
+ * @param requestId the request ID
  * @returns an http-based response status and body message
  */
-async function startScraping(chainKey: string) {
-  const appContext = await NestFactory.createApplicationContext(EventsScraperModule)
+async function startScraping(chain: string, requestId: string) {
+  // Validate the input chain key
+  if (!Object.values(ChainKey).includes(<ChainKey>chain)) {
+    logger.error(`Invalid chain key '${chain}' in request ${requestId}`)
+    return {
+      statusCode: HttpStatus.BAD_REQUEST,
+      body: JSON.stringify({
+        message: `Unsupported chain '${chain}`,
+      }),
+    }
+  }
+
+  // Build the execution context
+  const appContext = await getAppContext()
   const appService = appContext.get(FeeCollectorEventsScraper)
+  const chainKey = <ChainKey>chain
+
+  // Scrap latest FeeCollected events for the specified chain
   try {
     const res = await appService.scrapFeeCollectorEvents(chainKey)
     return {
@@ -45,14 +82,14 @@ async function startScraping(chainKey: string) {
       body: JSON.stringify(res),
     }
   } catch (error: any) {
-    const msgGenericMsg = `ERROR Scraping FeeCollector Events for chain '${chainKey}' failed`
-    logger.error(`${msgGenericMsg} - Events Scraping session ABORTED\n`, error)
+    const msgGenericMsg = `Failed to scrap FeeCollector events from chain '${chainKey}'`
+    logger.error(`${msgGenericMsg} - Events Scraping session '${requestId}' ABORTED\n`, error)
     return {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      body: {
-        message: JSON.stringify(msgGenericMsg),
+      body: JSON.stringify({
+        message: { msgGenericMsg },
         // error: error.response ?? error.message
-      },
+      }),
     }
   }
 }
@@ -60,7 +97,11 @@ async function startScraping(chainKey: string) {
 // Local dev entry point emulating the launch of the `FeeCollectorEventsScraper` function.
 // For automated local launch only - has no effect on a serverless deployment
 if (process.env.DEV_MODE === '1') {
-  startScraping('pol')
-    .then((res) => logger.info(`Result: ${JSON.stringify(res)}`))
+  const startTime = new Date()
+  startScraping(ChainKey.POL, startTime.toISOString())
+    .then((res) => {
+      const duration = new Date().getTime() - startTime.getTime()
+      logger.info(`Result in ${duration/1000}s : ${JSON.stringify(res)}`)
+    })
     .finally(() => process.exit())
 }
