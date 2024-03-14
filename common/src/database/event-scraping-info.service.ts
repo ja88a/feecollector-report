@@ -99,7 +99,7 @@ export class EventScrapingChainConfigPersistence {
         id: doc.chain.id,
         type: <ChainType>doc.chain.type,
         rpcUrl: doc.chain.rpcUrl,
-        latestBlockTag: doc.chain.lastBlockTag,
+        lastBlockTag: doc.chain.lastBlockTag,
       },
       feeCollector: {
         contract: doc.feeCollector.contract,

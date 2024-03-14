@@ -8,7 +8,7 @@ export const enum EEventScrapingStatus {
     INACTIVE = 'inactive',
 }
 
-/** Default block tags to use for retrieving the latest available block on a blockchain */
+/** Default block tags to use for retrieving the last available block on a blockchain */
 export const enum EBlockTagLatest {
     /** Safe to use block, almost confirmed/finalized */
     SAFE ='safe',
@@ -16,8 +16,8 @@ export const enum EBlockTagLatest {
     FINALIZED = 'finalized',
     /** Latest minted block */
     LATEST = 'latest',
-    /** Default tag to retrieve latest block */
-    DEFAULT = SAFE
+    /** Default tag to retrieve last block */
+    DEFAULT = FINALIZED
 }
 
 /** Configuration of onchain LiFi FeeCollector contracts */
@@ -39,8 +39,8 @@ export interface FeeCollectorChainConfig {
     /** URL of the default JSON RPC provider */
     rpcUrl: string
 
-    /** The tag to use for retrieving a chain [safe | confirmed] latest block */
-    latestBlockTag: number | string
+    /** The tag to use for retrieving a chain [safe | finalized] last block */
+    lastBlockTag: number | string
   }
 
   /** FeeCollector onchain related info */
