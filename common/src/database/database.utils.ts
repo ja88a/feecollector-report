@@ -19,7 +19,6 @@ export class EventScrapingUtils {
  * Utility for managing FeeCollectedEvent documents in the database.
  */
 export class FeeCollectedEventUtils {
-
   private static idPrefixEvent = 'event'
   private static idPrefixEventFeeCollected = 'feecollected'
 

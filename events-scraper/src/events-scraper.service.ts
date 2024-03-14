@@ -57,10 +57,12 @@ export class FeeCollectorEventsScraper {
       )
     })
 
-    // Check that the FeeCollector chain configuration is valid
+    // Check that the FeeCollector chain scraping is enabled
     if (chainConfig.status === EEventScrapingStatus.INACTIVE) {
+      const logMsg = `FeeCollector Events Scraping sessions HALTED on chain '${chainKey}'. Last scanned block: ${chainConfig.feeCollector.lastScanBlock}`
+      this.logger.warn(logMsg+ ` on ${new Date(chainConfig.feeCollector.lastScanTime || 0).toISOString()}`)
       return {
-        message: `FeeCollector Events Scraping sessions HALTED on chain '${chainKey}' - Last scanned block: ${chainConfig.feeCollector.lastScanBlock}`,
+        message: logMsg,
         eventsNew: 0,
         blocksScanned: 0,
       }
@@ -312,10 +314,10 @@ export class FeeCollectorEventsScraper {
         chainKey: <ChainKey>chainKey,
         txHash: event.transactionHash,
         blockTag: event.blockNumber,
-        token: parsedEvent.args[0],
-        integrator: parsedEvent.args[1],
-        integratorFee: BigNumber.from(parsedEvent.args[2]),
-        lifiFee: BigNumber.from(parsedEvent.args[3]),
+        token: parsedEvent?.args[0],
+        integrator: parsedEvent?.args[1],
+        integratorFee: BigNumber.from(parsedEvent?.args[2]),
+        lifiFee: BigNumber.from(parsedEvent?.args[3]),
       }
       return feesCollected
     })
