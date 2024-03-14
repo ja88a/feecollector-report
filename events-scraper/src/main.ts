@@ -87,7 +87,7 @@ async function startScraping(chain: string, requestId: string) {
     return {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       body: JSON.stringify({
-        message: { msgGenericMsg },
+        message: msgGenericMsg,
         // error: error.response ?? error.message
       }),
     }
@@ -95,13 +95,13 @@ async function startScraping(chain: string, requestId: string) {
 }
 
 // Local dev entry point emulating the launch of the `FeeCollectorEventsScraper` function.
-// For automated local launch only - has no effect on a serverless deployment
+// For automated local launch only - It has no effect in a serverless deployment context
 if (process.env.DEV_MODE === '1') {
   const startTime = new Date()
   startScraping(ChainKey.POL, startTime.toISOString())
     .then((res) => {
       const duration = new Date().getTime() - startTime.getTime()
-      logger.info(`Result in ${duration/1000}s : ${JSON.stringify(res)}`)
+      logger.info(`Process duration: ${duration/1000}s - Result: ${JSON.stringify(res)}`)
     })
     .finally(() => process.exit())
 }
