@@ -2,7 +2,12 @@ import { BlockTag } from '@ethersproject/abstract-provider'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config/dist/config.service'
 import { BigNumber, ethers } from 'ethers'
-import { feeCollectorChainConfigDefault } from 'feecollector-report-common/config'
+import {
+  CHAIN_LATEST_BLOCK_TAG_DEFAULT,
+  CHAIN_QUERY_FAIL_RETRY_NB_DEFAULT,
+  CHAIN_SCAN_BLOCKS_BATCH_SIZE_DEFAULT,
+  feeCollectorChainConfigDefault,
+} from 'feecollector-report-common/config'
 import {
   EventScrapingChainConfigPersistence,
   FeeCollectedEventPersistence,
@@ -10,7 +15,11 @@ import {
 import { Logger } from 'feecollector-report-common/logger'
 import { FeeCollector__factory } from 'lifi-contract-typings'
 import { ResultEventScrapingSession } from './dto/ResultEventScrapingSession.dto'
-import { EEventScrapingStatus, FeeCollectedEventParsed, FeeCollectorChainConfig } from 'feecollector-report-common/data'
+import {
+  EEventScrapingStatus,
+  FeeCollectedEventParsed,
+  FeeCollectorChainConfig,
+} from 'feecollector-report-common/data'
 import { ChainKey } from '@lifi/types'
 
 /**
@@ -64,24 +73,20 @@ export class FeeCollectorEventsScraper {
     )
 
     // Get the chain last block number
-    // Note: provider.getBlockNumber() returns latest block number, not the last confirmed or safe block
-    const lastBlockTag = 'finalized' // chainConfig.chain.lastBlockTag
-    const chainLastBlockNb = await feeCollectorContract.provider
-      .getBlock(lastBlockTag)
-      .then((lastBlock) => {
-        return lastBlock.number
-      })
-      .catch((error) => {
-        throw new Error(
-          `Failed to retrieve the last block number for chain '${chainKey}' using BlockTag ${lastBlockTag} \n${error.stack}`
-        )
-      })
+    const { chainLastBlockNb, lastBlockTag } = await this.getChainLastBlock(
+      chainConfig,
+      feeCollectorContract
+    )
 
     // Get the block number, last scanned one [and persisted in DB] or the one to start from per the target chain configuration
     const lastScannedBlockNb =
       chainConfig.feeCollector.lastScanBlock || chainConfig.feeCollector.blockStart - 1
+
+    // Log the scraping session info
     this.logger.info(
-      `Scraping FeeCollector.FeeCollected events on chain '${chainKey}' from block ${lastScannedBlockNb + 1 > chainLastBlockNb ? chainLastBlockNb : lastScannedBlockNb + 1} to last block ${chainLastBlockNb}`
+      `Scraping FeeCollector.FeeCollected events on chain '${chainKey}'` +
+        ` from block ${lastScannedBlockNb + 1 > chainLastBlockNb ? chainLastBlockNb : lastScannedBlockNb + 1} to last block ${chainLastBlockNb}` +
+        ` (${lastBlockTag})`
     )
 
     // Scrape the fee collected events through batches of blocks scanning
@@ -103,6 +108,47 @@ export class FeeCollectorEventsScraper {
   }
 
   /**
+   * Retrieves the last block number of the chain, using the BlockTag provided in the chain configuration.
+   * 
+   * Note: provider.getBlockNumber() returns latest block number (tag `latest`), not the last confirmed or safe block
+   * 
+   * @param chainConfig the FeeCollector chain configuration
+   * @param feeCollectorContract the FeeCollector contract instance
+   * @returns the last block number and the BlockTag used to retrieve it
+   */
+  private async getChainLastBlock(
+    chainConfig: FeeCollectorChainConfig,
+    feeCollectorContract: ethers.Contract,
+    nbRetries?: number
+  ): Promise<{ chainLastBlockNb: number; lastBlockTag: BlockTag }> {
+    const lastBlockTag = chainConfig.chain.lastBlockTag || CHAIN_LATEST_BLOCK_TAG_DEFAULT
+    const chainLastBlockNb = await feeCollectorContract.provider
+      .getBlock(lastBlockTag)
+      .then((lastBlock) => {
+        return lastBlock.number
+      })
+      .catch(async (error) => {
+        const retriesLeft = nbRetries ? nbRetries - 1 : CHAIN_QUERY_FAIL_RETRY_NB_DEFAULT - 1
+        if (retriesLeft > 0) {
+          this.logger.warn(
+            `Failed attempt to retrieve last block number for chain '${chainConfig.chainKey}' using the Block Tag '${lastBlockTag}' (Attempts left: ${retriesLeft}): ${error}`
+          )
+          const result = await this.getChainLastBlock(
+            chainConfig,
+            feeCollectorContract,
+            retriesLeft
+          )
+          return result.chainLastBlockNb
+        } else {
+          throw new Error(
+            `Failed to retrieve last block number for chain '${chainConfig.chainKey}' using the Block Tag '${lastBlockTag}'\n${error.stack}`
+          )
+        }
+      })
+    return { chainLastBlockNb, lastBlockTag }
+  }
+
+  /**
    * Scrapes FeeCollector.FeeCollected events from the blockchain blocks, starting from the last scanned block until last one.
    * Operates in batches of blocks, to reduce the number of calls to the RPC provider, the data post-processing & its DB storage.
    * @param lastScannedBlockNb The last block number that was scanned.
@@ -120,10 +166,13 @@ export class FeeCollectorEventsScraper {
   ) {
     const chainKey = feeCollectorChainConfig.chainKey || ''
     let countCollectedEvents = 0
-    const batchSize: number = +this.configService.get('SCRAPER_BLOCKS_BATCH_SIZE')
+    const batchSize = +this.configService.get(
+      'CHAIN_SCAN_BLOCKS_BATCH_SIZE',
+      CHAIN_SCAN_BLOCKS_BATCH_SIZE_DEFAULT
+    )
     let blockStart = lastScannedBlockNb + 1
     while (blockStart <= chainLastBlockNb) {
-      let blockEnd = blockStart + batchSize
+      let blockEnd = blockStart + batchSize - 1
       if (blockEnd > chainLastBlockNb) {
         blockEnd = chainLastBlockNb
       }
@@ -141,7 +190,7 @@ export class FeeCollectorEventsScraper {
 
       if (feeCollectedEvents.length > 0) {
         this.logger.info(
-          `Found ${feeCollectedEvents.length} FeeCollectedEvent${feeCollectedEvents.length > 1 ? 's' : ''} (last block ${blockEnd})`
+          `Found ${feeCollectedEvents.length} FeeCollected Event${feeCollectedEvents.length > 1 ? 's' : ''} (last block ${blockEnd})`
         )
 
         // Parse the fee collected events
@@ -225,10 +274,23 @@ export class FeeCollectorEventsScraper {
   private async loadFeeCollectorEvents(
     feeCollector: ethers.Contract,
     fromBlock: BlockTag,
-    toBlock: BlockTag
+    toBlock: BlockTag,
+    nbRetries?: number
   ): Promise<ethers.Event[]> {
     const filter = feeCollector.filters.FeesCollected()
-    return feeCollector.queryFilter(filter, fromBlock, toBlock)
+    return await feeCollector.queryFilter(filter, fromBlock, toBlock).catch((error) => {
+      const retriesLeft = nbRetries ? nbRetries - 1 : CHAIN_QUERY_FAIL_RETRY_NB_DEFAULT - 1
+      if (retriesLeft > 0) {
+        this.logger.warn(
+          `Failed attempt to query FeeCollected events on blocks [${fromBlock}, ${toBlock}] (Attempts left: ${retriesLeft}): ${error}`
+        )
+        return this.loadFeeCollectorEvents(feeCollector, fromBlock, toBlock, retriesLeft)
+      } else {
+        throw new Error(
+          `Failed to query FeeCollected events in blocks [${fromBlock}, ${toBlock}]\n${error.stack}`
+        )
+      }
+    })
   }
 
   /**
