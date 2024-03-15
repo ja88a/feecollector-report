@@ -4,9 +4,9 @@ import { FeesReporterController } from './fees-reporter.controller'
 import { FeesReporterService } from './fees-reporter.service'
 import {
   EventScrapingChainConfig,
-  EventScrapingChainConfigPersistence,
+  StoreEventScrapingChainConfig,
   FeeCollectedEvent,
-  FeeCollectedEventPersistence,
+  StoreFeeCollectedEvent,
 } from 'feecollector-report-common'
 import { KindagooseModule } from 'kindagoose'
 
@@ -30,8 +30,8 @@ import { KindagooseModule } from 'kindagoose'
   controllers: [FeesReporterController],
   providers: [
     FeesReporterService,
-    EventScrapingChainConfigPersistence,
-    FeeCollectedEventPersistence,
+    StoreEventScrapingChainConfig,
+    StoreFeeCollectedEvent,
   ],
 })
 export class FeesReporterModule {}

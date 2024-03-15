@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { ChainTokenFeesBN, IntegratorCollectedFeesReport } from './dto/IntegratorCollectedFees'
+import {
+  ChainTokenAmount,
+  IntegratorCollectedFeesReport,
+  createIntegratorCollectedFeesReport,
+} from './data/IntegratorCollectedFeesReport.dto'
 import { Logger } from 'feecollector-report-common/logger'
-import { FeeCollectedEventPersistence } from 'feecollector-report-common/database'
+import { StoreFeeCollectedEvent } from 'feecollector-report-common/database'
+import { ChainTokenFeesBN } from './data/ChainTokenFeesBN'
 
 /**
  * Collected Fees reporting service
  */
 @Injectable()
 export class FeesReporterService {
-
   /** Logger */
   private readonly logger = Logger.child({
     label: FeesReporterService.name,
@@ -16,7 +20,7 @@ export class FeesReporterService {
 
   constructor(
     //  private readonly eventScrapingChainConfigPersistence: EventScrapingChainConfigPersistence,
-    private readonly feeCollectedEventPersistence: FeeCollectedEventPersistence
+    private readonly feeCollectedEventPersistence: StoreFeeCollectedEvent
   ) {}
 
   async init(): Promise<void> {
@@ -37,7 +41,7 @@ export class FeesReporterService {
     const integratorFeeCollectedEvents =
       await this.feeCollectedEventPersistence.retrieveFeeCollectedEventsByIntegrator(integratorId)
 
-    // Sum ip the collected fees for each chain token
+    // Sum up the collected fees for each chain token
     const collectedFeesIntegrator = new Map<string, ChainTokenFeesBN>()
     const collectedFeesLifi = new Map<string, ChainTokenFeesBN>()
 
@@ -68,7 +72,6 @@ export class FeesReporterService {
       }
     }
 
-    // Convert the collected fees into an exportable JSON report
     return {
       integrator: integratorId,
       integratorCollectedFees: Array.from(collectedFeesIntegrator.values()).map((value) => ({

@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { FeesReporterModule } from './fees-reporter.module'
 import { EConfigRunMode, MS_CONFIG } from 'feecollector-report-common/config'
-import { LogLevel, VersioningType } from '@nestjs/common'
+import { VersioningType } from '@nestjs/common'
 
 import { SwaggerModule, DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger'
 
@@ -32,7 +32,7 @@ async function bootstrap() {
   // Listen for shutdown hooks
   app.enableShutdownHooks()
 
-  // Publish the app server's OpenAPI
+  // Publish the app server's OpenAPI specs: Web & json
   if (process.env.OPENAPI_PUBLISH === 'true' ? true : MS_CONFIG.OPENAPI_PUBLISH) {
     const config = new DocumentBuilder()
       .setTitle('FeeCollector Reporter API')
