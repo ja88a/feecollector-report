@@ -4,9 +4,9 @@ import { KindagooseModule } from 'kindagoose'
 import { FeeCollectorEventsScraper } from './events-scraper.service'
 import {
   EventScrapingChainConfig,
-  EventScrapingChainConfigPersistence,
+  StoreEventScrapingChainConfig,
   FeeCollectedEvent,
-  FeeCollectedEventPersistence,
+  StoreFeeCollectedEvent,
 } from 'feecollector-report-common/database'
 
 /**
@@ -35,8 +35,8 @@ import {
   controllers: [],
   providers: [
     FeeCollectorEventsScraper,
-    EventScrapingChainConfigPersistence,
-    FeeCollectedEventPersistence,
+    StoreEventScrapingChainConfig,
+    StoreFeeCollectedEvent,
   ],
 })
 export class EventsScraperModule {}

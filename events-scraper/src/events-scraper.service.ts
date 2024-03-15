@@ -9,8 +9,8 @@ import {
   feeCollectorChainConfigDefault,
 } from 'feecollector-report-common/config'
 import {
-  EventScrapingChainConfigPersistence,
-  FeeCollectedEventPersistence,
+  StoreEventScrapingChainConfig,
+  StoreFeeCollectedEvent,
 } from 'feecollector-report-common/database'
 import { Logger } from 'feecollector-report-common/logger'
 import { FeeCollector__factory } from 'lifi-contract-typings'
@@ -39,9 +39,9 @@ export class FeeCollectorEventsScraper {
     /** Config settings service */
     private readonly configService: ConfigService,
     /** DB connector for the EventScrapingChain config */
-    private eventScrapingChainConfigPersistence: EventScrapingChainConfigPersistence,
+    private eventScrapingChainConfigPersistence: StoreEventScrapingChainConfig,
     /** DB connector for the FeeCollected events */
-    private feeCollectedEventPersistence: FeeCollectedEventPersistence
+    private feeCollectedEventPersistence: StoreFeeCollectedEvent
   ) {}
 
   /**

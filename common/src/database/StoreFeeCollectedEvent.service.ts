@@ -10,9 +10,9 @@ import { BigNumber } from 'ethers/lib/ethers'
  * Service for storing and retrieving FeeCollected events emitted by the FeeCollector contract to/from the database
  */
 @Injectable()
-export class FeeCollectedEventPersistence {
+export class StoreFeeCollectedEvent {
   private readonly logger = Logger.child({
-    label: FeeCollectedEventPersistence.name,
+    label: StoreFeeCollectedEvent.name,
   })
 
   constructor(

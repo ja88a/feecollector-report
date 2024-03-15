@@ -12,10 +12,10 @@ import { EEventScrapingStatus, FeeCollectorChainConfig } from '../data/FeeCollec
  * Service for storing and retrieving onchain-related scraping information data about FeeCollector events
  */
 @Injectable()
-export class EventScrapingChainConfigPersistence {
+export class StoreEventScrapingChainConfig {
   /** Private logger */
   private readonly logger = Logger.child({
-    label: EventScrapingChainConfigPersistence.name,
+    label: StoreEventScrapingChainConfig.name,
   })
 
   constructor(

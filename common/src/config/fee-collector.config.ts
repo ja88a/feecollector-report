@@ -25,7 +25,7 @@ export const feeCollectorChainConfigDefault: Map<string, FeeCollectorChainConfig
         id: ChainId.POL,
         type: ChainType.EVM,
         rpcUrl: 'https://polygon-rpc.com',
-        lastBlockTag: EBlockTagLatest.DEFAULT,
+        lastBlockTag: EBlockTagLatest.default,
       },
       feeCollector: {
         contract: '0xbD6C7B0d2f68c2b7805d88388319cfB6EcB50eA9',

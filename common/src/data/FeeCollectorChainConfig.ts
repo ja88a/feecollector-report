@@ -17,7 +17,7 @@ export const enum EBlockTagLatest {
     /** Latest minted block */
     LATEST = 'latest',
     /** Default tag to retrieve last block */
-    DEFAULT = FINALIZED
+    default = FINALIZED
 }
 
 /** Configuration of onchain LiFi FeeCollector contracts */

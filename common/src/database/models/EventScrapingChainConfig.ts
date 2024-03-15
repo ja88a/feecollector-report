@@ -1,4 +1,5 @@
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
+import { Severity } from '@typegoose/typegoose/lib/internal/constants'
 import { modelOptions } from '@typegoose/typegoose/lib/modelOptions'
 import { prop } from '@typegoose/typegoose/lib/prop'
 
@@ -49,7 +50,7 @@ class FeeCollectorProperties {
  */
 @modelOptions({
   schemaOptions: { collection: 'EventScrapingChainConfigs', versionKey: 'version',  },
-  options: { disableCaching: false },
+  options: { disableCaching: false, allowMixed: Severity.ALLOW },
 })
 export class EventScrapingChainConfig extends TimeStamps {
   /** Model version number */
