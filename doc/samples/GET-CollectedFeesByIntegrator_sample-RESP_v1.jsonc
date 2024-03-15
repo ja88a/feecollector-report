@@ -1,0 +1,58 @@
+// Sample response to request 'GET /api/v1/collectedfees/integrators/:integratorId'
+{
+  "integrator": "0xD5e230cEa6dA2F0C62bdeED2Cf85326F1063e27D",
+  "integratorCollectedFees": [
+    {
+      "chainKey": "pol",
+      "token": "0x61299774020dA444Af134c82fa83E3810b309991",
+      "amount": "3568269029400000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a",
+      "amount": "1700000000000000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x1a3acf6D19267E2d3e7f898f42803e90C9219062",
+      "amount": "14872750900000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x2598c30330D5771AE9F983979209486aE26dE875",
+      "amount": "10287932500000000000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0xc4a206a306F0dB88F98A3591419bc14832536862",
+      "amount": "52383759354061117900000"
+    }
+  ],
+  "lifiCollectedFees": [
+    {
+      "chainKey": "pol",
+      "token": "0x61299774020dA444Af134c82fa83E3810b309991",
+      "amount": "629694534600000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a",
+      "amount": "300000000000000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x1a3acf6D19267E2d3e7f898f42803e90C9219062",
+      "amount": "2624603100000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0x2598c30330D5771AE9F983979209486aE26dE875",
+      "amount": "1815517500000000000"
+    },
+    {
+      "chainKey": "pol",
+      "token": "0xc4a206a306F0dB88F98A3591419bc14832536862",
+      "amount": "9244192827187256100000"
+    }
+  ]
+}
