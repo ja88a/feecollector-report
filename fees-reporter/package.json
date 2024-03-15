@@ -1,6 +1,6 @@
 {
   "name": "feecollector-report-api",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "LiFi offchain services: FeeCollector Reporter API",
   "author": {
     "name": "Jabba ø1",

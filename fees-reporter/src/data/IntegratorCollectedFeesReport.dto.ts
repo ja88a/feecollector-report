@@ -1,4 +1,5 @@
 import {
+  IsEthereumAddress,
   IsHexadecimal,
   IsNotEmpty,
   IsNumberString,
@@ -50,6 +51,8 @@ export class IntegratorCollectedFeesReport {
   /** Address of the integrator */
   // @IsEthereumAddress()
   @IsNotEmpty()
+  @IsHexadecimal()
+  @IsEthereumAddress()
   integrator: string
 
   /** Fees collected by the integrator */

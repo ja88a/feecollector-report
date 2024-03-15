@@ -26,6 +26,7 @@ services:
     environment:
       NODE_ENV: production
       LOG_LEVEL: info # warn
+      OPENAPI_PUBLISH: true
       MONGODB_PROTOCOL: mongodb
       MONGODB_HOST: fcrs-db
       MONGODB_PORT: 27017

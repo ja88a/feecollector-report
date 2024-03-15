@@ -1,6 +1,6 @@
 {
   "name": "feecollector-report-monorepo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mono-repository of LiFi FeeCollector Events Reporting Services - offchain",
   "author": {
     "name": "Jabba ø1",
